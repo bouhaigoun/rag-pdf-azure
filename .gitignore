@@ -26,3 +26,6 @@ docs/*.pdf
 # OS
 .DS_Store
 Thumbs.db
+# Internal dev tools
+CLAUDE.md
+.claude/
