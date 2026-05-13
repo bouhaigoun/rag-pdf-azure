@@ -1,5 +1,28 @@
+# Secrets
 .env
+
+# Outils de dev perso
+.claude/
+.vscode/
+.idea/
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+dist/
+build/
+
+# Logs
 *.log
+
+# Fichiers de test (PDFs clients)
 docs/*.pdf
+
+# OS
+.DS_Store
+Thumbs.db
