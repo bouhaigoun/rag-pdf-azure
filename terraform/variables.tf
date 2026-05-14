@@ -31,3 +31,8 @@ variable "vm_size" {
   description = "Size of the Azure virtual machine"
   default     = "Standard_B2ms"
 }
+
+variable "location" {
+  description = "Azure region for all resources"
+  default     = "West Europe"
+}
