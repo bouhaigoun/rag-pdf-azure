@@ -29,3 +29,6 @@ Thumbs.db
 # Internal dev tools
 CLAUDE.md
 .claude/
+
+# Documents internes
+*.docx
