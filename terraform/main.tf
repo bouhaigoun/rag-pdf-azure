@@ -13,7 +13,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "rag_prod" {
   name     = "rg-rag-pdf-prod"
-  location = "var.location"
+  location = var.location
 }
 
 resource "azurerm_virtual_network" "rag_vnet" {
