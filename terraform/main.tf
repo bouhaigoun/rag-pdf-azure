@@ -102,7 +102,7 @@ resource "azurerm_linux_virtual_machine" "rag_vm" {
   name                = "vm-rag-prod"
   resource_group_name = azurerm_resource_group.rag_prod.name
   location            = azurerm_resource_group.rag_prod.location
-  size                = "Standard_B2s"
+  size                = var.vm_size
   admin_username      = "azureuser"
 
   network_interface_ids = [

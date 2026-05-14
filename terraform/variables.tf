@@ -26,3 +26,8 @@ variable "public_ip_sku" {
   description = "SKU for the public IP address"
   default     = "Standard"
 }
+
+variable "vm_size" {
+  description = "Size of the Azure virtual machine"
+  default     = "Standard_B2ms"
+}
