@@ -9,7 +9,9 @@
   "nodes": [
     {
       "parameters": {
-        "options": {}
+        "options": {
+          "responseMode": "lastNode"
+        }
       },
       "id": "f73ccc51-f3b3-46d6-83a3-90411945ce8a",
       "name": "When chat message received",
