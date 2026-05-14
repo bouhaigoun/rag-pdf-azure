@@ -1,19 +1,28 @@
-services:
-  n8n:
-    image: n8nio/n8n
-    ports:
-      - "5678:5678"
-    volumes:
-      - n8n_data:/home/node/.n8n
-    networks:
-      - rag-network
+# docker-compose.yml — Architecture DEV complète
+# Flask API + n8n avec variables d'environnement injectées depuis .env
 
+services:
   flask-api:
     build: .
     ports:
       - "8000:8000"
     env_file:
       - .env
+    networks:
+      - rag-network
+
+  n8n:
+    image: n8nio/n8n
+    ports:
+      - "5678:5678"
+    environment:
+      # Injecte la clé Mistral dans n8n depuis .env
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+      # Persistance des données n8n
+      - N8N_USER_MANAGEMENT_DISABLED=false
+    volumes:
+      # Persiste credentials et workflows entre redémarrages
+      - n8n_data:/home/node/.n8n
     networks:
       - rag-network
 
