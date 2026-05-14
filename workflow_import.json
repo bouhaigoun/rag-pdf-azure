@@ -1,6 +1,5 @@
 {
   "name": "Agent RAG PDF - Azure",
-  "active": false,
   "nodes": [
     {
       "parameters": {
@@ -143,34 +142,5 @@
   },
   "settings": {
     "executionOrder": "v1"
-  },
-  "staticData": null,
-  "meta": null,
-  "pinData": null,
-  "versionId": "a361d82c-c2e6-4301-8e48-ab32f2505a0f",
-  "activeVersionId": null,
-  "versionCounter": 1,
-  "triggerCount": 0,
-  "shared": [
-    {
-      "updatedAt": "2026-05-11T21:39:13.338Z",
-      "createdAt": "2026-05-11T21:39:13.338Z",
-      "role": "workflow:owner",
-      "workflowId": "axp1Pu50TTCgeUpe",
-      "projectId": "PhxFSIZ6TIKmwc21",
-      "project": {
-        "updatedAt": "2026-04-21T18:27:08.095Z",
-        "createdAt": "2026-04-21T18:23:35.021Z",
-        "id": "PhxFSIZ6TIKmwc21",
-        "name": "nabil bouhaigoun <bouhaigoun.nabil@gmail.com>",
-        "type": "personal",
-        "icon": null,
-        "description": null,
-        "creatorId": "05cd8a51-3d07-4ddf-b9c5-68b2e2af4db1"
-      }
-    }
-  ],
-  "tags": [],
-  "parentFolder": null,
-  "activeVersion": null
+  }
 }

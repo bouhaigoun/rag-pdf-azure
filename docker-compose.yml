@@ -37,9 +37,9 @@ services:
     env_file:
       - .env
     volumes:
-      # Monte le script init et le workflow
+      # Monte le script init et le workflow nettoyé
       - ./scripts/init.sh:/init.sh
-      - ./workflow_n8n.json:/app/workflow_n8n.json
+      - ./workflow_import.json:/app/workflow_import.json
     # Exécute le script une seule fois au démarrage
     command: sh /init.sh
     networks:

@@ -46,7 +46,7 @@ echo "📥 Import workflow RAG PDF..."
 RESPONSE=$(curl -s -X POST "$N8N_URL/api/v1/workflows" \
   -H "Content-Type: application/json" \
   -H "X-N8N-API-KEY: ${N8N_API_KEY}" \
-  --data-binary @/app/workflow_n8n.json)
+  --data-binary @/app/workflow_import.json)
 echo "Réponse workflow : $RESPONSE"
 
 echo ""
