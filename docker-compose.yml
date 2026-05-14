@@ -1,5 +1,6 @@
-# docker-compose.yml — Architecture DEV complète
-# Flask API + n8n avec variables d'environnement injectées depuis .env
+# docker-compose.yml — Architecture DEV ISOPROD
+# Flask API + n8n + init automatique credentials et workflow
+# Le client fait uniquement : git clone + cp .env.example .env + docker-compose up -d
 
 services:
   flask-api:
@@ -16,13 +17,31 @@ services:
     ports:
       - "5678:5678"
     environment:
-      # Injecte la clé Mistral dans n8n depuis .env
+      # Injecte les variables depuis .env
       - MISTRAL_API_KEY=${MISTRAL_API_KEY}
-      # Persistance des données n8n
-      - N8N_USER_MANAGEMENT_DISABLED=false
+      - N8N_API_KEY=${N8N_API_KEY}
+      # Active l'API n8n pour le script init
+      - N8N_PUBLIC_API_DISABLED=false
     volumes:
       # Persiste credentials et workflows entre redémarrages
       - n8n_data:/home/node/.n8n
+      # Monte le workflow pour que init.sh puisse l'importer
+      - ./workflow_n8n.json:/app/workflow_n8n.json
+    networks:
+      - rag-network
+
+  n8n-init:
+    image: curlimages/curl:latest
+    depends_on:
+      - n8n
+    env_file:
+      - .env
+    volumes:
+      # Monte le script init et le workflow
+      - ./scripts/init.sh:/init.sh
+      - ./workflow_n8n.json:/app/workflow_n8n.json
+    # Exécute le script une seule fois au démarrage
+    command: sh /init.sh
     networks:
       - rag-network
 
