@@ -13,7 +13,7 @@ services:
       - rag-network
 
   n8n:
-    image: n8nio/n8n
+    image: n8nio/n8n:stable
     ports:
       - "5678:5678"
     environment:

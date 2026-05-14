@@ -32,3 +32,4 @@ CLAUDE.md
 
 # Documents internes
 *.docx
+.env
