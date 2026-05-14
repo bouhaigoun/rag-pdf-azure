@@ -1,0 +1,176 @@
+{
+  "name": "Agent RAG PDF - Azure",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "f73ccc51-f3b3-46d6-83a3-90411945ce8a",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "81e9a753-c103-4f18-af3e-2e1d69e0e8a0"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "Tu es un assistant expert en analyse de documents IT (appels d'offres, contrats, CCTP).\nUtilise toujours l'outil RechercheDocuments pour repondre.\nCite systematiquement : fichier source, article, numero de page."
+        }
+      },
+      "id": "d377ceaa-c2a6-4e26-bcb6-351894748230",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "model": "mistral-small-latest",
+        "options": {}
+      },
+      "id": "861d925e-7efb-4fdd-a5b7-05a4cedf53fa",
+      "name": "Mistral Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        120,
+        280
+      ],
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "hYQphYx6HQWMdD6R",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 3
+      },
+      "id": "5bb1fe70-c559-4444-822c-bd6eaa38bbde",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.2,
+      "position": [
+        360,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "name": "RechercheDocuments",
+        "description": "Recherche semantique dans les documents PDF indexes (appels d'offres, contrats, CCTP). Retourne la reponse et les sources (fichier, page, article).",
+        "method": "POST",
+        "url": "http://localhost:8000/query",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "keypair",
+        "bodyParameters": {
+          "values": [
+            {
+              "name": "question",
+              "value": "={{ $fromAI('question', 'La question a rechercher dans les documents') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "52732696-97d5-4a14-b070-3b44f336e2cd",
+      "name": "RechercheDocuments",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        600,
+        280
+      ]
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RechercheDocuments": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "a361d82c-c2e6-4301-8e48-ab32f2505a0f",
+  "activeVersionId": null,
+  "versionCounter": 1,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-11T21:39:13.338Z",
+      "createdAt": "2026-05-11T21:39:13.338Z",
+      "role": "workflow:owner",
+      "workflowId": "axp1Pu50TTCgeUpe",
+      "projectId": "PhxFSIZ6TIKmwc21",
+      "project": {
+        "updatedAt": "2026-04-21T18:27:08.095Z",
+        "createdAt": "2026-04-21T18:23:35.021Z",
+        "id": "PhxFSIZ6TIKmwc21",
+        "name": "nabil bouhaigoun <bouhaigoun.nabil@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "05cd8a51-3d07-4ddf-b9c5-68b2e2af4db1"
+      }
+    }
+  ],
+  "tags": [],
+  "parentFolder": null,
+  "activeVersion": null
+}
