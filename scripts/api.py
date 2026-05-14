@@ -107,7 +107,7 @@ def health():
 
 @app.post("/query")
 def query():
-    body = request.get_json(silent=True)
+    body = request.get_json(silent=True, force=True)
     if not body or "question" not in body:
         return jsonify({"error": "Corps JSON requis avec le champ 'question'"}), 400
 

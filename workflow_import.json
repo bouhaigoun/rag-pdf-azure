@@ -73,8 +73,15 @@
         "url": "http://flask-api:8000/query",
         "sendBody": true,
         "contentType": "json",
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({question: $fromAI('question', 'La question a rechercher dans les documents')}) }}",
+        "specifyBody": "keypair",
+        "bodyParameters": {
+          "values": [
+            {
+              "name": "question",
+              "value": "={{ $fromAI('question', 'La question a rechercher dans les documents') }}"
+            }
+          ]
+        },
         "options": {}
       },
       "id": "52732696-97d5-4a14-b070-3b44f336e2cd",
