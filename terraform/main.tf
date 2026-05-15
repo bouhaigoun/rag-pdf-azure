@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.0"
+      version = "~> 4.0"
     }
   }
 }
@@ -36,6 +36,7 @@ resource "azurerm_public_ip" "rag_ip" {
   resource_group_name = azurerm_resource_group.rag_prod.name
   allocation_method   = "Static"
   sku                 = var.public_ip_sku
+  zones               = ["1"]
 }
 
 resource "azurerm_network_security_group" "rag_nsg" {
@@ -103,6 +104,9 @@ resource "azurerm_linux_virtual_machine" "rag_vm" {
   resource_group_name = azurerm_resource_group.rag_prod.name
   location            = azurerm_resource_group.rag_prod.location
   size                = var.vm_size
+  secure_boot_enabled = true
+  vtpm_enabled        = true
+  zone                = "1"
   admin_username      = "azureuser"
 
   network_interface_ids = [
@@ -120,9 +124,9 @@ resource "azurerm_linux_virtual_machine" "rag_vm" {
   }
 
   source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
+    publisher = "canonical"
+    offer     = "ubuntu-24_04-lts"
+    sku       = "server"
     version   = "latest"
   }
 
