@@ -1,189 +1,137 @@
-# Agent RAG — Recherche intelligente dans documents PDF
+# RAG Agent — Intelligent PDF Document Search
 
-![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)
-![Azure](https://img.shields.io/badge/Azure-AI%20Search-0078D4?logo=microsoftazure&logoColor=white)
-![Mistral](https://img.shields.io/badge/Mistral-AI-FF7000?logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
-![n8n](https://img.shields.io/badge/n8n-Orchestration-EA4B71?logo=n8n&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.11-blue) ![Azure](https://img.shields.io/badge/Azure-AI_Search-blue) ![Mistral](https://img.shields.io/badge/Mistral-API-orange) ![Docker](https://img.shields.io/badge/Docker-Compose-blue) ![n8n](https://img.shields.io/badge/n8n-2.19-green)
 
-Pipeline RAG (Retrieval-Augmented Generation) pour la recherche sémantique dans des documents PDF. Indexe automatiquement les PDFs vers Azure AI Search via embeddings Mistral, expose une API Flask, et orchestre les workflows via n8n.
+RAG (Retrieval-Augmented Generation) pipeline for semantic search in PDF documents. Automatically index PDFs into Azure AI Search using Mistral embeddings, expose a Flask API, and orchestrate workflows via n8n.
 
-**185 chunks indexés · 21 PDFs (AOs IT) · Hébergement France Central (RGPD)**
+> 185 chunks indexed · 21 PDFs (IT RFPs) · Hosted in France Central (GDPR compliant)
 
----
+## Tech Stack
 
-## Stack technique
-
-| Composant | Rôle |
+| Component | Role |
 |-----------|------|
-| **Azure AI Search** | Index vectoriel HNSW — 1024 dimensions |
-| **Azure Blob Storage** | Stockage des PDFs sources |
-| **Mistral API** | Embeddings (`mistral-embed`) + génération (`mistral-large`) |
-| **Flask API** | Endpoint `/query` — interface REST pour la recherche |
-| **n8n** | Orchestration des workflows d'ingestion et de requête |
-| **Docker Compose** | Déploiement production (n8n + Flask API) |
-
----
+| Azure AI Search | HNSW vector index — 1024 dimensions |
+| Azure Blob Storage | PDF source storage |
+| Mistral API | Embeddings (`mistral-embed`) + generation (`mistral-large`) |
+| Flask API | `/query` endpoint — REST interface |
+| n8n | Ingestion and query workflow orchestration |
+| Docker Compose | Production deployment (n8n + Flask API) |
 
 ## Architecture
+INGESTION
+PDF upload
+│
+▼
+Azure Blob Storage
+│
+▼  (n8n workflow)
+Chunking (paragraphs)
+│
+▼
+Mistral Embeddings (mistral-embed, 1024 dims)
+│
+▼
+Azure AI Search Index
+QUERY
+User question
+│
+▼
+Flask API /query
+├── Query embedding (mistral-embed)
+├── Vector search Azure AI Search (top-k chunks)
+├── Enriched prompt (context + question)
+└── Mistral LLM (mistral-large) → Answer + citations
+## Getting Started
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        INGESTION                                │
-│                                                                 │
-│   PDF upload                                                    │
-│       │                                                         │
-│       ▼                                                         │
-│   Azure Blob Storage  ──────────────────────────────────────┐  │
-│       │                                                      │  │
-│       ▼  (n8n workflow)                                      │  │
-│   Chunking (paragraphes)                                     │  │
-│       │                                                      │  │
-│       ▼                                                      │  │
-│   Mistral Embeddings (mistral-embed, 1024 dims)              │  │
-│       │                                                      │  │
-│       ▼                                                      │  │
-│   Azure AI Search Index  ◄───────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
+### Prerequisites
+- Docker and Docker Compose
+- Azure account (AI Search + Blob Storage active)
+- Mistral API key
 
-┌─────────────────────────────────────────────────────────────────┐
-│                         REQUÊTE                                 │
-│                                                                 │
-│   Question utilisateur                                          │
-│       │                                                         │
-│       ▼                                                         │
-│   Flask API /query                                              │
-│       │                                                         │
-│       ├── Embedding requête (mistral-embed)                     │
-│       │                                                         │
-│       ├── Recherche vectorielle Azure AI Search (top-k chunks)  │
-│       │                                                         │
-│       ├── Prompt enrichi (contexte + question)                  │
-│       │                                                         │
-│       └── Mistral LLM (mistral-large) → Réponse + citations     │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Installation et démarrage
-
-### Prérequis
-
-- Docker et Docker Compose installés
-- Compte Azure (AI Search + Blob Storage actifs)
-- Clé API Mistral
-
-### 1. Variables d'environnement
-
+### 1. Environment Variables
 ```bash
 cp .env.example .env
 ```
 
-Renseigner les variables dans `.env` :
-
-```env
-# Azure
+Fill in `.env`:
+Azure
 AZURE_SEARCH_ENDPOINT=https://<service>.search.windows.net
 AZURE_SEARCH_KEY=<admin-key>
 AZURE_SEARCH_INDEX=rag-pdf-index
 AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;...
 AZURE_CONTAINER_NAME=pdfs
-
-# Mistral
+Mistral
 MISTRAL_API_KEY=<api-key>
-
-# n8n
+n8n
 N8N_WEBHOOK_URL=http://n8n:5678/webhook/rag-query
-```
-
-### 2. Démarrage Docker Compose
-
+### 2. Start with Docker Compose
 ```bash
 docker compose up -d
 ```
+Starts:
+- Flask API on `http://localhost:5000`
+- n8n on `http://localhost:5678`
 
-Démarre :
-- **Flask API** sur `http://localhost:5000`
-- **n8n** sur `http://localhost:5678`
-
-### 3. Création de l'index Azure AI Search
-
+### 3. Create Azure AI Search Index
 ```bash
 python scripts/setup_index.py
 ```
 
-### 4. Ingestion des PDFs
-
-Déposer les PDFs dans `docs/`, puis :
-
+### 4. Ingest PDFs
+Drop PDFs in `docs/`, then:
 ```bash
 python scripts/ingest.py --source docs/
 ```
 
-### 5. Import du workflow n8n
+### 5. Import n8n Workflow
+In n8n UI (`http://localhost:5678`), import `workflow_n8n.json`.
 
-Dans l'interface n8n (`http://localhost:5678`), importer le fichier `workflow_n8n.json`.
+## Usage
 
----
-
-## Utilisation
-
-### API REST
-
+### REST API
 ```bash
 curl -X POST http://localhost:5000/query \
   -H "Content-Type: application/json" \
-  -d '{"question": "Quelles sont les exigences techniques pour les AOs infrastructure ?"}'
+  -d '{"question": "What are the technical requirements for IT RFPs?"}'
 ```
 
-Réponse :
-
+Response:
 ```json
 {
-  "answer": "Les exigences techniques incluent...",
+  "answer": "Technical requirements include...",
   "sources": [
     { "filename": "ao_007.pdf", "chunk": "...", "score": 0.94 }
   ]
 }
 ```
 
-### Script CLI
-
+### CLI
 ```bash
-python scripts/query.py "Quelles sont les exigences en matière de cybersécurité ?"
+python scripts/query.py "What are the cybersecurity requirements?"
 ```
 
----
-
-## Structure du projet
-
-```
+## Project Structure
 rag-pdf-azure/
-├── docker-compose.yml        # Stack n8n + Flask API
-├── Dockerfile                # Image Flask API
-├── requirements.txt          # Dépendances Python
-├── workflow_n8n.json         # Export workflow n8n (importable)
-├── .env.example              # Template variables d'environnement
-├── docs/                     # PDFs à ingérer (non commité)
+├── docker-compose.yml
+├── Dockerfile
+├── requirements.txt
+├── workflow_n8n.json
+├── .env.example
+├── docs/
 └── scripts/
-    ├── api.py                # Flask API — endpoint /query
-    ├── setup_index.py        # Création index Azure AI Search
-    ├── setup_azure.py        # Configuration ressources Azure
-    ├── ingest.py             # Ingestion PDF → chunks → embeddings
-    ├── query.py              # CLI de requête RAG
-    └── create_n8n_workflow.py # Génération programmatique du workflow
-```
+├── api.py
+├── setup_index.py
+├── setup_azure.py
+├── ingest.py
+├── query.py
+└── create_n8n_workflow.py
+## Data & Compliance
 
----
-
-## Données et conformité
-
-| Paramètre | Valeur |
-|-----------|--------|
-| Région Azure | France Central |
-| Documents indexés | 21 PDFs (Appels d'Offres IT) |
+| Parameter | Value |
+|-----------|-------|
+| Azure Region | France Central |
+| Indexed documents | 21 PDFs (IT RFPs) |
 | Chunks | 185 |
-| Modèle embeddings | `mistral-embed` (1024 dims) |
-| Modèle LLM | `mistral-large` |
-| Conformité | RGPD — données hébergées en France |
+| Embedding model | `mistral-embed` (1024 dims) |
+| LLM model | `mistral-large` |
+| Compliance | GDPR — data hosted in France |
